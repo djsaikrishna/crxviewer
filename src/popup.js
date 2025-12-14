@@ -77,7 +77,58 @@ function ready2() {
         doDownload();
     } else if (gActionClickAction == 'view-source') {
         doViewSource();
+        return;
     }
+    showPermissionPromptIfMissingHostPermission();
+}
+function showPermissionPromptIfMissingHostPermission() {
+    if (!crx_url.startsWith('http')) {
+        return; // Permissions only needed and available for http(s).
+    }
+    var hostPermission = new URL(crx_url).origin + '/*';
+    chrome.permissions.contains({ origins: [hostPermission] }, function(ok) {
+        // The API will report OK if the user accepted the full permission
+        // request, or manually specified a subset.
+        if (!ok) {
+            showPermissionPrompt();
+        }
+    });
+}
+function showPermissionPrompt() {
+    var form = document.getElementById('permission_missing_form');
+    form.hidden = false;
+    form.onsubmit = function(e) {
+        e.preventDefault();
+        var permission = {
+            origins: ['*://*/*']
+        };
+        chrome.permissions.request(permission, function(hasAccess) {
+            if (hasAccess) {
+                form.hidden = true;
+            }
+        });
+    };
+    form.onreset = function(e) {
+        form.hidden = true;
+    };
+}
+function alert(msg) {
+    var dialog = document.createElement('dialog');
+    dialog.style.whiteSpace = 'pre-wrap';
+    dialog.style.wordBreak = 'break-all';
+    dialog.textContent = msg;
+    dialog.onclose = function() {
+        dialog.remove();
+    };
+    var closeButton = document.createElement('button');
+    closeButton.onclick = function() {
+        dialog.close();
+    };
+    closeButton.textContent = 'OK';
+    dialog.append(closeButton);
+    document.body.append(dialog);
+    dialog.showModal();
+    showPermissionPromptIfMissingHostPermission();
 }
 var hasDownloadedOnce = false;
 function doDownload() {

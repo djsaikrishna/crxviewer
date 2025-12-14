@@ -29,9 +29,19 @@
     #download:not(.downloading) .busy {
         display: none;
     }
+    #permission_missing_form:not([hidden]) ~ button {
+        display: none;
+    }
 </style>
 </head>
 <body>
+<form id="permission_missing_form" hidden>
+    To view this extension's source, an extra permission is needed.<br>
+    This permission can be revoked at any time at the
+    <a href="/options.html" target="_blank">options page</a>.<br><br>
+    <button type="submit">Add permission</button>
+    <button type="reset">Cancel</button>
+</form>
 <button id="download" title="Download extension in zip format">
     <span class="idle">Download as zip</span>
     <span class="busy">Downloading...</span>
