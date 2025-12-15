@@ -180,6 +180,10 @@ function getMimeTypeForFilename(filename) {
         return 'application/zip';
     case 'md':
         return 'text/plain';
+    case 'cjs':
+    case 'jsm':
+    case 'mjs':
+        return 'application/javascript';
     }
     return zip.getMimeType(filename);
 }
